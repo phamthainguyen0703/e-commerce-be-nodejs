@@ -4,9 +4,10 @@
 
 POST {{url_dev}}/shop/signup
 Content-Type: application/json
+x-api-key: ce9507b3d3ce8a9e2569df1c654b5e9e6161b3395fd583bc0b2c44fc1f8b2f43698442657cdb2a608f5c3d9a9b7cf185d27532e4aaeb98e0b72458af360af794
 
 {
  "name": "ABC",
- "email": "phamthainguyen03@gmail.com",
+ "email": "phamthainguyen05@gmail.com",
  "password": "123456"
 }
