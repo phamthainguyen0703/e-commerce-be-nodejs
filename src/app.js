@@ -19,13 +19,27 @@ require("./dbs/init.mongodb");
 // init routes
 
 app.use("/", require("./routes"));
-app.get("/", (req, res, next) => {
-  const strCompress = "test Compression";
-  return res.status(200).json({
-    message: "Welcome!",
-    message: strCompress.repeat(10000),
+// app.get("/", (req, res, next) => {
+//   const strCompress = "test Compression";
+//   return res.status(200).json({
+//     message: "Welcome!",
+//     message: strCompress.repeat(10000),
+//   });
+// });
+
+// handling error
+app.use((req, res, next) => {
+  const error = new Error("Not Found");
+  error.status = 404;
+  next(error);
+});
+
+app.use((error, req, res, next) => {
+  const statusCode = error.status || 500;
+  return res.status(statusCode).json({
+    status: "error",
+    code: statusCode,
+    message: error.message || `Internal Sever Error`,
   });
 });
-// handling error
-
 module.exports = app;
