@@ -39,43 +39,49 @@ class AccessService {
 
       if (newShop) {
         //step 2: create privateKey, publicKey
-        const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
-          modulusLength: 4096,
-          publicKeyEncoding: {
-            type: "pkcs1",
-            format: "pem",
-          },
-          privateKeyEncoding: {
-            type: "pkcs1",
-            format: "pem",
-          },
-        });
+
         //publicKey cryptoGraphy Standards
+        // const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
+        //   modulusLength: 4096,
+        //   publicKeyEncoding: {
+        //     type: "pkcs1",
+        //     format: "pem",
+        //   },
+        //   privateKeyEncoding: {
+        //     type: "pkcs1",
+        //     format: "pem",
+        //   },
+        // });
+
+        const privateKey = crypto.randomBytes(64).toString("hex");
+        const publicKey = crypto.randomBytes(64).toString("hex");
 
         console.log({ privateKey, publicKey }); // save collection KeyStore
 
-        const publicKeyString = await KeyTokenService.createKeyToken({
+        const KeyStore = await KeyTokenService.createKeyToken({
           userId: newShop._id,
           publicKey,
+          privateKey,
         });
 
-        if (!publicKeyString) {
+        if (!KeyStore) {
           return {
             code: "XXXXXXXX",
             message: "publicKeyString Error",
           };
         }
-        console.log("publicKeyString: ", publicKeyString);
-        const publicKeyObject = crypto.createPublicKey(publicKeyString);
-        console.log(
-          "🚀 ~ AccessService ~ signUp= ~ publicKeyObject:",
-          publicKeyObject
-        );
+
+        // console.log("publicKeyString: ", publicKeyString);
+        // const publicKeyObject = crypto.createPublicKey(publicKeyString);
+        // console.log(
+        //   "🚀 ~ AccessService ~ signUp= ~ publicKeyObject:",
+        //   publicKeyObject
+        // );
 
         //step 3: create token pair
         const tokens = await createTokenPair(
           { userId: newShop._id, email: newShop.email },
-          publicKeyString,
+          publicKey,
           privateKey
         );
         console.log(`created token successfully::`, tokens);
