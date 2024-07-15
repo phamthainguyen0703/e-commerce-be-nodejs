@@ -2,7 +2,7 @@
 
 const shopModel = require("../models/shop.model");
 const bcrypt = require("bcrypt");
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 const KeyTokenService = require("./keyToken.service");
 const { createTokenPair } = require("../auth/authUtils");
 const { getInfoData } = require("../utils");
@@ -49,11 +49,11 @@ class AccessService {
       privateKey
     );
     await KeyTokenService.createKeyToken({
-      userId,
-      publicKey,
-      privateKey,
       refreshToken: tokens.refreshToken,
-    }).then();
+      privateKey,
+      publicKey,
+      userId,
+    });
     return {
       metadata: {
         shop: getInfoData({
@@ -63,6 +63,12 @@ class AccessService {
         tokens,
       },
     };
+  };
+
+  static logOut = async (KeyStore) => {
+    const deleteKey = await KeyTokenService.removeKeyById(KeyStore._id);
+    console.log("🚀 ~ AccessService ~ logOut= ~ deleteKey:", deleteKey);
+    return deleteKey;
   };
 
   static signUp = async ({ name, email, password }) => {
@@ -139,11 +145,7 @@ class AccessService {
               fields: ["_id", "name", "email"],
               object: newShop,
             }),
-            // shop: {
-            //   _id: newShop._id,
-            //   name: newShop.name,
-            //   email: newShop.email,
-            // },
+
             tokens,
           },
         };

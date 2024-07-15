@@ -4,19 +4,19 @@
 
 POST {{url_dev}}/shop/signup
 Content-Type: application/json
-x-api-key: ce9507b3d3ce8a9e2569df1c654b5e9e6161b3395fd583bc0b2c44fc1f8b2f43698442657cdb2a608f5c3d9a9b7cf185d27532e4aaeb98e0b72458af360af794
+x-api-key: a0138ab912ab7db9f80c5645aca48785b8bdd0afe0b57ae064516897b7f317aa0b49463f7659531e966fd1280e337c5b631da732c0261ad9d80c47bc83dc57e1
 
 {
  "name": "ABC",
- "email": "phamthainguyen99@gmail.com",
+ "email": "phamthainguyen9999@gmail.com",
  "password": "123456"
 }
 
-### signin
+### login
 
 POST {{url_dev}}/shop/login
 Content-Type: application/json
-x-api-key: ce9507b3d3ce8a9e2569df1c654b5e9e6161b3395fd583bc0b2c44fc1f8b2f43698442657cdb2a608f5c3d9a9b7cf185d27532e4aaeb98e0b72458af360af794
+x-api-key: a0138ab912ab7db9f80c5645aca48785b8bdd0afe0b57ae064516897b7f317aa0b49463f7659531e966fd1280e337c5b631da732c0261ad9d80c47bc83dc57e1
 
 {
  "name": "ABC",
@@ -25,4 +25,10 @@ x-api-key: ce9507b3d3ce8a9e2569df1c654b5e9e6161b3395fd583bc0b2c44fc1f8b2f4369844
 }
 
 
+### logout
+
+POST {{url_dev}}/shop/logout
+Content-Type: application/json
+x-api-key: a0138ab912ab7db9f80c5645aca48785b8bdd0afe0b57ae064516897b7f317aa0b49463f7659531e966fd1280e337c5b631da732c0261ad9d80c47bc83dc57e1
+x-client-id: 6693a6d74df0528d599a56e2
 

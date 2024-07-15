@@ -23,7 +23,7 @@ class Database {
     mongoose
       .connect(connectString, { maxPoolSize: 50 })
       .then((_) => {
-        console.log(`Connect success PRO`);
+        console.log(`Connect success to DB`);
         countConnect();
       })
       .catch((err) => console.log(`Error connecting`));
@@ -39,4 +39,5 @@ class Database {
 
 const instanceMongodb = Database.getInstance();
 
+module.exports = instanceMongodb;
 // cách mới áp dụng design pattern singleton: viết singleton instance để khởi tạo kết nối
