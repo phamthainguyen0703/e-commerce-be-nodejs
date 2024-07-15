@@ -4,9 +4,13 @@ const shopModel = require("../models/shop.model");
 const bcrypt = require("bcrypt");
 const crypto = require("node:crypto");
 const KeyTokenService = require("./keyToken.service");
-const { createTokenPair } = require("../auth/authUtils");
+const { createTokenPair, verifyJWT } = require("../auth/authUtils");
 const { getInfoData } = require("../utils");
-const { BadRequestError, AuthFailureError } = require("../core/error.response");
+const {
+  BadRequestError,
+  AuthFailureError,
+  ForbiddenError,
+} = require("../core/error.response");
 
 //service
 const { findByEmail } = require("./shop.service");
@@ -19,7 +23,8 @@ const RoleShop = {
 };
 
 class AccessService {
-  /*
+  static logIn = async ({ email, password, refreshToken = null }) => {
+    /*
       1 - check email in dbs
       2 - check password in dbs
       3 - create AccessToken vs RefreshToken and save to dbs
@@ -27,7 +32,6 @@ class AccessService {
       5 - get data return login
   */
 
-  static logIn = async ({ email, password, refreshToken = null }) => {
     //step 1
     const foundShop = await findByEmail({ email });
     if (!foundShop) {
@@ -161,6 +165,60 @@ class AccessService {
         status: "error",
       };
     }
+  };
+
+  static handleRefreshToken = async (refreshToken) => {
+    // kiểm tra xem token đã được sử dụng hay chưa
+    const foundToken = await KeyTokenService.findByRefreshTokenUsed(
+      refreshToken
+    );
+    //nếu có => xóa tất cả token trong keyStore
+    if (foundToken) {
+      //decode xem ai dang login
+      const { userId, email } = await verifyJWT(
+        refreshToken,
+        foundToken.privateKey
+      );
+      console.log({ userId, email });
+      // xoa
+      await KeyTokenService.deleteKeyById(userId);
+      throw new ForbiddenError("something went wrong!!! Please login");
+    }
+    //nếu không => verify token
+    const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
+    if (!holderToken) {
+      throw new AuthFailureError("Shop not found");
+    }
+
+    const { userId, email } = await verifyJWT(
+      refreshToken,
+      holderToken.privateKey
+    );
+    console.log("2---", { userId, email });
+
+    const foundShop = await findByEmail({ email });
+    if (!foundShop) {
+      throw new AuthFailureError("Invalid email");
+    }
+    // create new token pair
+    const tokens = await createTokenPair(
+      { userId, email },
+      holderToken.publicKey,
+      holderToken.privateKey
+    );
+    //update token
+    await holderToken.updateOne({
+      $set: {
+        refreshToken: tokens.refreshToken,
+      },
+      $addToSet: {
+        refreshTokensUsed: refreshToken, //đã được sử dụng để lấy token mới
+      },
+    });
+    return {
+      user: { userId, email },
+      tokens,
+    };
   };
 }
 module.exports = AccessService;
